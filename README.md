@@ -9,7 +9,7 @@ A retailer offers a rewards program to its customers, awarding points based on e
 
 1.Solve using Spring Boot
 
-2.Create a RESTful endpoint
+2.Create a RESTful endpoint
 
 3.Make up a data set to best demonstrate your solution
 
@@ -71,7 +71,7 @@ INSERT INTO transactions (customer_id, amount, tx_Date, reference) VALUES
 (1, 45.00,  '2025-12-18','INV-TXC-04'),
 (1, 130.00, '2025-11-02','INV-TXC-05');
 
--- Bob: edge cases around thresholds
+-- Rose: edge cases around thresholds
 INSERT INTO transactions (customer_id, amount, tx_date, reference) VALUES
 (2, 50.00,  '2026-01-03','INV-TXC-06'),
 (2, 51.00,  '2025-12-15','INV-TXC-07'),
@@ -79,7 +79,7 @@ INSERT INTO transactions (customer_id, amount, tx_date, reference) VALUES
 (2, 101.00, '2025-11-12','INV-TXC-09'),
 (2, 150.00, '2025-11-22','INV-TXC-10');
 
--- Chitra: multiple mid-range
+-- Happy: multiple mid-range
 INSERT INTO transactions (customer_id, amount, tx_Date, reference) VALUES
 (3, 90.00,  '2026-01-08','INV-TXC-11'),
 (3, 43.00, '2026-01-25','INV-TXC-12'),
