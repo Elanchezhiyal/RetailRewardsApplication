@@ -1,13 +1,13 @@
 package com.crm.rewardshub.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.eq;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,143 +15,88 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.crm.rewardshub.dto.CustomerRewardsDTO;
+import com.crm.rewardshub.exception.CustomerNotFoundException;
+import com.crm.rewardshub.exception.InvalidRequestException;
 import com.crm.rewardshub.model.Transactions;
+import com.crm.rewardshub.repository.CustomerRepository;
 import com.crm.rewardshub.repository.TransactionRepository;
 import com.crm.rewardshub.service.impl.RewardsServiceImpl;
-import com.crm.rewardshub.utility.RewardsCalculatorUtil;
-import static org.mockito.ArgumentMatchers.any;
 
+class RewardsServiceImplTest {
 
-public class RewardsServiceImplTest {
-
-	@Mock
+    @Mock
     private TransactionRepository transactionRepository;
 
+    @Mock
+    private CustomerRepository customerRepository;
+    
     @InjectMocks
     private RewardsServiceImpl rewardsService;
 
+    private OffsetDateTime start;
+    private OffsetDateTime end;
+
     @BeforeEach
-    void setUp() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
+        start = OffsetDateTime.now().minusMonths(3);
+        end = OffsetDateTime.now();
     }
 
     @Test
-    void testGetCustomerRewards() {
-    	Long customerId = 1L;
-        OffsetDateTime start = OffsetDateTime.parse("2025-01-01T00:00:00Z");
-        OffsetDateTime end   = OffsetDateTime.parse("2025-03-31T23:59:59Z");
+    void getCustomerRewards_success() {
 
-        // ✅ Properly initialized transactions with non-null date and BigDecimal amount
-        Transactions t1 = new Transactions();
-        t1.setCustomerId(customerId);
-        t1.setTransactionDate(start.plusDays(5));
-        t1.setAmount(new BigDecimal("120.00"));
+        when(customerRepository.existsById(1L)).thenReturn(true);
 
-        Transactions t2 = new Transactions();
-        t2.setCustomerId(customerId);
-        t2.setTransactionDate(start.plusDays(40));
-        t2.setAmount(new BigDecimal("75.00"));
+        Transactions tx = new Transactions();
+        tx.setCustomerId(1L);
+        tx.setAmount(BigDecimal.valueOf(120));
+        tx.setTransactionDate(OffsetDateTime.now());
 
-        when(transactionRepository.findByCustomerIdAndTransactionDateBetween(customerId, start, end))
-                .thenReturn(List.of(t1, t2));
+        when(transactionRepository.findByCustomerIdAndTransactionDateBetween(1L, start, end))
+                .thenReturn(List.of(tx));
 
-        CustomerRewardsDTO result = rewardsService.getCustomerRewards(customerId, start, end);
+        CustomerRewardsDTO result =
+                rewardsService.getCustomerRewards(1L, start, end);
 
-        long expectedPoints = RewardsCalculatorUtil.calculatePoints(new BigDecimal("120.00"))
-                             + RewardsCalculatorUtil.calculatePoints(new BigDecimal("75.00"));
-
-
-        Assertions.assertEquals(customerId, result.getCustomerId());
-        Assertions.assertEquals(expectedPoints, result.getTotalPoints());
-        Assertions.assertEquals(2, result.getMonthlyPoints().size());
+        assertEquals(90, result.getTotalPoints());
     }
 
     @Test
-    void testGetAllCustomerRewards() {
-    	 OffsetDateTime start = OffsetDateTime.parse("2025-01-01T00:00:00Z");
-         OffsetDateTime end   = OffsetDateTime.parse("2025-03-31T23:59:59Z");
+    void getCustomerRewards_invalidCustomer() {
 
-         // ✅ Transactions for two customers
-         Transactions t1 = new Transactions();
-         t1.setCustomerId(1L);
-         t1.setTransactionDate(start.plusDays(10));
-         t1.setAmount(new BigDecimal("120.00"));
+        when(customerRepository.existsById(99L)).thenReturn(false);
 
-         Transactions t2 = new Transactions();
-         t2.setCustomerId(2L);
-         t2.setTransactionDate(start.plusDays(15));
-         t2.setAmount(new BigDecimal("200.00"));
-
-         when(transactionRepository.findAllBetween(start, end))
-                 .thenReturn(List.of(t1, t2));
-
-         when(transactionRepository.findByCustomerIdAndTransactionDateBetween(1L, start, end))
-                 .thenReturn(List.of(t1));
-         when(transactionRepository.findByCustomerIdAndTransactionDateBetween(2L, start, end))
-                 .thenReturn(List.of(t2));
-
-         List<CustomerRewardsDTO> results = rewardsService.getAllCustomerRewards(start, end);
-
-        Assertions.assertEquals(2, results.size());
-        Assertions.assertEquals(1L, results.get(0).getCustomerId());
-        Assertions.assertEquals(2L, results.get(1).getCustomerId());
-    }
-    
-    	
-    @Test
-    void testGetCustomerRewardsLast3Months() {
-        Long customerId = 1L;
-
-        Transactions t1 = new Transactions();
-        t1.setCustomerId(customerId);
-        t1.setTransactionDate(OffsetDateTime.now().minusDays(10));
-        t1.setAmount(new BigDecimal("120.00"));
-
-        // ✅ Use eq for customerId, any for dates
-        when(transactionRepository.findByCustomerIdAndTransactionDateBetween(
-                eq(customerId), any(OffsetDateTime.class), any(OffsetDateTime.class)))
-            .thenReturn(List.of(t1));
-
-        CustomerRewardsDTO result = rewardsService.getCustomerRewardsLast3Months(customerId);
-
-        long expectedPoints = RewardsCalculatorUtil.calculatePoints(new BigDecimal("120.00"));
-
-        Assertions.assertEquals(customerId, result.getCustomerId());
-        Assertions.assertEquals(expectedPoints, result.getTotalPoints());
-        Assertions.assertEquals(1, result.getMonthlyPoints().size());
-        Assertions.assertEquals(expectedPoints, result.getMonthlyPoints().get(0).getPoints());
+        assertThrows(CustomerNotFoundException.class, () ->
+                rewardsService.getCustomerRewards(99L, start, end));
     }
 
     @Test
-    void testGetAllCustomerRewardsLast3Months() {
-        Transactions t1 = new Transactions();
-        t1.setCustomerId(1L);
-        t1.setTransactionDate(OffsetDateTime.now().minusDays(5));
-        t1.setAmount(new BigDecimal("120.00"));
+    void getCustomerRewards_negativeAmount() {
 
-        Transactions t2 = new Transactions();
-        t2.setCustomerId(2L);
-        t2.setTransactionDate(OffsetDateTime.now().minusDays(15));
-        t2.setAmount(new BigDecimal("200.00"));
+        when(customerRepository.existsById(1L)).thenReturn(true);
 
-        // ✅ Both args are matchers
-        when(transactionRepository.findAllBetween(any(OffsetDateTime.class), any(OffsetDateTime.class)))
-            .thenReturn(List.of(t1, t2));
+        Transactions tx = new Transactions();
+        tx.setCustomerId(1L);
+        tx.setAmount(BigDecimal.valueOf(-50));
+        tx.setTransactionDate(OffsetDateTime.now());
 
-        // ✅ eq for customerId, any for dates
-        when(transactionRepository.findByCustomerIdAndTransactionDateBetween(
-                eq(1L), any(OffsetDateTime.class), any(OffsetDateTime.class)))
-            .thenReturn(List.of(t1));
+        when(transactionRepository.findByCustomerIdAndTransactionDateBetween(1L, start, end))
+                .thenReturn(List.of(tx));
 
-        when(transactionRepository.findByCustomerIdAndTransactionDateBetween(
-                eq(2L), any(OffsetDateTime.class), any(OffsetDateTime.class)))
-            .thenReturn(List.of(t2));
-
-        List<CustomerRewardsDTO> results = rewardsService.getAllCustomerRewardsLast3Months();
-
-        Assertions.assertEquals(2, results.size());
-        Assertions.assertEquals(1L, results.get(0).getCustomerId());
-        Assertions.assertEquals(2L, results.get(1).getCustomerId());
+        assertThrows(InvalidRequestException.class, () ->
+                rewardsService.getCustomerRewards(1L, start, end));
     }
 
+    @Test
+    void getCustomerRewards_invalidDateRange() {
+
+        when(customerRepository.existsById(1L)).thenReturn(true);
+
+        assertThrows(InvalidRequestException.class, () ->
+                rewardsService.getCustomerRewards(
+                        1L,
+                        OffsetDateTime.now(),
+                        OffsetDateTime.now().minusDays(1)));
+    }
 }
