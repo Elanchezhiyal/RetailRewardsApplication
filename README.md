@@ -34,19 +34,6 @@ git clone https://github.com/Elanchezhiyal/RetailRewardsApplication.git
 
 <img width="563" height="276" alt="image" src="https://github.com/user-attachments/assets/42d558ef-e96a-4cd2-806c-6fdf7061b1be" />
 
-
-Sample API requests:
---------------------
-1. Get Rewards for a Specific Customer (last 3 months
-      GET http://localhost:8081/api/rewards/customers/{customerId}/last3months
-      sample: GET http://localhost:8081/api/rewards/customers/1/last3months
-
-2. Get Rewards for All Customers (last 3 months)
-      GET http://localhost:8081/api/rewards/customers/last3months
-
-3. Get Rewards for a Customer Between Custom Dates
-      GET http://localhost:8081/api/rewards/customers/1?startDate=2025-10-01&endDate=2026-01-01
-
 Mysql db sample queries:
 ------------------------
 Tables Customers and transactions haven been created during application creation.
@@ -86,3 +73,238 @@ INSERT INTO transactions (customer_id, amount, tx_Date, reference) VALUES
 (3, 95.00,  '2026-01-14','INV-TXC-13'),
 (3, 115.00, '2025-12-05','INV-TXC-14'),
 (3, 60.00,  '2025-10-18','INV-TXC-15');
+
+
+Sample API requests:
+--------------------
+1. Get Rewards for a Specific Customer (last 3 months
+      GET http://localhost:8081/api/rewards/customers/{customerId}/last3months
+      sample: GET http://localhost:8081/api/rewards/customers/3/last3months
+
+       sample response:
+         {
+            "code": 200,
+            "message": "SUCCESS",
+            "payload": {
+                "customerId": 2,
+                "monthlyPoints": [
+                    {
+                        "year": 2025,
+                        "month": 11,
+                        "points": 202
+                    },
+                    {
+                        "year": 2025,
+                        "month": 12,
+                        "points": 51
+                    },
+                    {
+                        "year": 2026,
+                        "month": 1,
+                        "points": 0
+                    }
+                ],
+                "totalPoints": 253,
+                "customerName": null
+            }
+        }
+
+2. Get Rewards for All Customers (last 3 months)
+      GET http://localhost:8081/api/rewards/customers/last3months
+   
+       sample response:
+            {
+          "code": 200,
+          "message": "SUCCESS",
+          "payload": [
+              {
+                  "customerId": 1,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 11,
+                          "points": 110
+                      },
+                      {
+                          "year": 2025,
+                          "month": 12,
+                          "points": 250
+                      },
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 115
+                      }
+                  ],
+                  "totalPoints": 475,
+                  "customerName": null
+              },
+              {
+                  "customerId": 2,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 11,
+                          "points": 202
+                      },
+                      {
+                          "year": 2025,
+                          "month": 12,
+                          "points": 51
+                      },
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 0
+                      }
+                  ],
+                  "totalPoints": 253,
+                  "customerName": null
+              },
+              {
+                  "customerId": 3,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 12,
+                          "points": 80
+                      },
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 85
+                      }
+                  ],
+                  "totalPoints": 165,
+                  "customerName": null
+              },
+              {
+                  "customerId": 4,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 11,
+                          "points": 70
+                      }
+                  ],
+                  "totalPoints": 70,
+                  "customerName": null
+              },
+              {
+                  "customerId": 5,
+                  "monthlyPoints": [
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 45
+                      }
+                  ],
+                  "totalPoints": 45,
+                  "customerName": null
+              }
+          ]
+      }
+             
+
+3. Get Rewards for a specific customer Between Custom Dates
+     GET http://localhost:8081/api/rewards/customers/{customerId}?startDate=<date>&endDate=<date>
+     sample: GET http://localhost:8081/api/rewards/customers/1?startDate=2025-12-01T00:00:00Z&endDate=2026-01-31T23:59:59Z
+
+       sample Response:
+           {
+          "code": 200,
+          "message": "SUCCESS",
+          "payload": {
+              "customerId": 1,
+              "monthlyPoints": [
+                  {
+                      "year": 2025,
+                      "month": 12,
+                      "points": 250
+                  },
+                  {
+                      "year": 2026,
+                      "month": 1,
+                      "points": 115
+                  }
+              ],
+              "totalPoints": 365,
+              "customerName": null
+            }
+          }
+4.  Get Rewards for all customers Between Custom Dates
+    GET  http://localhost:8081/api/rewards/customers?startDate=<date>&endDate=<date>
+    sample: GET http://localhost:8081/api/rewards/customers?startDate=2025-12-01T00:00:00Z&endDate=2026-01-31T23:59:59Z
+
+        sample Response:
+
+          {
+          "code": 200,
+          "message": "SUCCESS",
+          "payload": [
+              {
+                  "customerId": 1,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 12,
+                          "points": 250
+                      },
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 115
+                      }
+                  ],
+                  "totalPoints": 365,
+                  "customerName": null
+              },
+              {
+                  "customerId": 2,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 12,
+                          "points": 51
+                      },
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 0
+                      }
+                  ],
+                  "totalPoints": 51,
+                  "customerName": null
+              },
+              {
+                  "customerId": 3,
+                  "monthlyPoints": [
+                      {
+                          "year": 2025,
+                          "month": 12,
+                          "points": 80
+                      },
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 85
+                      }
+                  ],
+                  "totalPoints": 165,
+                  "customerName": null
+              },
+              {
+                  "customerId": 5,
+                  "monthlyPoints": [
+                      {
+                          "year": 2026,
+                          "month": 1,
+                          "points": 45
+                      }
+                  ],
+                  "totalPoints": 45,
+                  "customerName": null
+              }
+          ]
+      }
+
