@@ -5,15 +5,22 @@ import java.util.List;
 public class CustomerRewardsDTO {
 
 	private Long customerId;
-	private String customerName;
-	private List<MonthlyPointsDTO> monthlyPoints;
-	private long totalPoints;
-	
+    private List<MonthlyPointsDTO> monthlyPoints;
+    private Long totalPoints;
+    private String customerName;
+
+    public CustomerRewardsDTO(Long customerId,
+                              List<MonthlyPointsDTO> monthlyPoints,
+                              Long totalPoints) {
+        this.customerId = customerId;
+        this.monthlyPoints = monthlyPoints;
+        this.totalPoints = totalPoints;
+    }
 
 	public CustomerRewardsDTO() {}
 	
 	public CustomerRewardsDTO(Long customerId, String customerName,
-	                            List<MonthlyPointsDTO> monthlyPoints, long totalPoints) {
+	                            List<MonthlyPointsDTO> monthlyPoints, Long totalPoints) {
 	    this.customerId = customerId;
 	    this.customerName = customerName;
 	    this.monthlyPoints = monthlyPoints;
@@ -22,10 +29,9 @@ public class CustomerRewardsDTO {
 
 	
 
-	public CustomerRewardsDTO(Long customerId, List<MonthlyPointsDTO> monthlyPoints, long totalPoints) {
+	public CustomerRewardsDTO(Long customerId, Long totalPoints) {
 		super();
 		this.customerId = customerId;
-		this.monthlyPoints = monthlyPoints;
 		this.totalPoints = totalPoints;
 	}
 

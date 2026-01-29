@@ -1,76 +1,148 @@
 package com.crm.rewardshub.service.impl;
 
 import java.time.OffsetDateTime;
-import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.crm.rewardshub.dto.CustomerRewardsDTO;
 import com.crm.rewardshub.dto.MonthlyPointsDTO;
+import com.crm.rewardshub.exception.CustomerNotFoundException;
+import com.crm.rewardshub.exception.InvalidRequestException;
 import com.crm.rewardshub.model.Transactions;
+import com.crm.rewardshub.repository.CustomerRepository;
 import com.crm.rewardshub.repository.TransactionRepository;
 import com.crm.rewardshub.service.RewardsService;
 import com.crm.rewardshub.utility.RewardsCalculatorUtil;
 
 @Service
 public class RewardsServiceImpl implements RewardsService{
-	
-	@Autowired
-	private TransactionRepository transactionRepository;
-	
+    private static final ZoneId APP_ZONE = ZoneId.of("UTC");
 
-    @Override
-    public CustomerRewardsDTO getCustomerRewardsLast3Months(Long customerId) {
-        OffsetDateTime end = OffsetDateTime.now();
-        OffsetDateTime start = end.minusMonths(3);
-        return getCustomerRewards(customerId, start, end);
+    private final TransactionRepository transactionRepository;
+    private final CustomerRepository customerRepository;
+
+    public RewardsServiceImpl(TransactionRepository transactionRepository,
+                              CustomerRepository customerRepository) {
+        this.transactionRepository = transactionRepository;
+        this.customerRepository = customerRepository;
     }
 
+    // -------------------- CUSTOM RANGE – ONE CUSTOMER --------------------
+    @Override
+    public CustomerRewardsDTO getCustomerRewards(
+            long customerId,
+            OffsetDateTime startDate,
+            OffsetDateTime endDate) {
+
+        validateCustomer(customerId);
+        validateDates(startDate, endDate);
+
+        List<Transactions> transactions =
+                transactionRepository.findByCustomerIdAndTransactionDateBetween(
+                        customerId, startDate, endDate);
+
+        return buildCustomerRewards(customerId, transactions);
+    }
+
+    // -------------------- CUSTOM RANGE – ALL CUSTOMERS --------------------
+    @Override
+    public List<CustomerRewardsDTO> getAllCustomerRewards(
+            OffsetDateTime startDate,
+            OffsetDateTime endDate) {
+
+        validateDates(startDate, endDate);
+
+        return transactionRepository
+                .findByTransactionDateBetween(startDate, endDate)
+                .stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        Transactions::getCustomerId))
+                .entrySet()
+                .stream()
+                .map(e -> buildCustomerRewards(e.getKey(), e.getValue()))
+                .toList();
+    }
+
+    // -------------------- LAST 3 MONTHS – ONE CUSTOMER --------------------
+    @Override
+    public CustomerRewardsDTO getCustomerRewardsLast3Months(long customerId) {
+
+        validateCustomer(customerId);
+
+        OffsetDateTime endDate = OffsetDateTime.now(APP_ZONE);
+        OffsetDateTime startDate = endDate.minusMonths(3);
+
+        return getCustomerRewards(customerId, startDate, endDate);
+    }
+
+    // -------------------- LAST 3 MONTHS – ALL CUSTOMERS --------------------
     @Override
     public List<CustomerRewardsDTO> getAllCustomerRewardsLast3Months() {
-        OffsetDateTime end = OffsetDateTime.now();
-        OffsetDateTime start = end.minusMonths(3);
-        return getAllCustomerRewards(start, end);
+
+        OffsetDateTime endDate = OffsetDateTime.now(APP_ZONE);
+        OffsetDateTime startDate = endDate.minusMonths(3);
+
+        return getAllCustomerRewards(startDate, endDate);
     }
-    @Override
-	public CustomerRewardsDTO getCustomerRewards(Long customerId,
-                 OffsetDateTime start,
-                 OffsetDateTime end) {
-		List<Transactions> txs = transactionRepository.findByCustomerIdAndTransactionDateBetween(customerId, start, end);
-		
-		Map<YearMonth, Long> pointsByMonth = txs.stream()
-				.collect(Collectors.groupingBy(
-						t -> YearMonth.from(t.getTransactionDate().toLocalDate()),
-						Collectors.summingLong(t -> RewardsCalculatorUtil.calculatePoints(t.getAmount()))
-						));
-		
-		List<MonthlyPointsDTO> monthly = pointsByMonth.entrySet().stream()
-				 .sorted(Map.Entry.comparingByKey())
-				 .map(e -> new MonthlyPointsDTO(e.getKey().getYear(), e.getKey().getMonthValue(), e.getValue()))
-				 .collect(Collectors.toList());
-		
-		long total = monthly.stream().mapToLong(MonthlyPointsDTO::getPoints).sum();
-		
-		return new CustomerRewardsDTO(customerId, monthly, total);
-	 }
-		
-    @Override
-	public List<CustomerRewardsDTO> getAllCustomerRewards(OffsetDateTime start,
-	                          OffsetDateTime end) {
-		 List<Transactions> txs = transactionRepository.findAllBetween(start, end);
-		
-		 Set<Long> customerIds = txs.stream()
-				 .map(Transactions::getCustomerId)
-				 .collect(Collectors.toSet());
 
-		 return customerIds.stream()
-				 .map(id -> getCustomerRewards(id, start, end))
-				 .collect(Collectors.toList());
-	}
+    // -------------------- BUILD RESPONSE --------------------
+    private CustomerRewardsDTO buildCustomerRewards(
+            long customerId,
+            List<Transactions> transactions) {
 
+        Map<String, Long> monthlyPointsMap =
+                transactions.stream()
+                        .map(tx -> Map.entry(
+                                tx.getTransactionDate().getYear() + "-" +
+                                tx.getTransactionDate().getMonthValue(),
+                                RewardsCalculatorUtil.calculatePoints(tx.getAmount())))
+                        .collect(java.util.stream.Collectors.groupingBy(
+                                Map.Entry::getKey,
+                                java.util.stream.Collectors.summingLong(Map.Entry::getValue)));
+
+        List<MonthlyPointsDTO> monthlyPoints =
+                monthlyPointsMap.entrySet().stream()
+                        .map(e -> {
+                            String[] parts = e.getKey().split("-");
+                            return new MonthlyPointsDTO(
+                                    Integer.parseInt(parts[0]),
+                                    Integer.parseInt(parts[1]),
+                                    e.getValue());
+                        })
+                        .sorted((a, b) ->
+                                a.getYear() != b.getYear()
+                                        ? a.getYear() - b.getYear()
+                                        : a.getMonth() - b.getMonth())
+                        .toList();
+
+        long totalPoints =
+                monthlyPoints.stream()
+                        .mapToLong(MonthlyPointsDTO::getPoints)
+                        .sum();
+
+        return new CustomerRewardsDTO(customerId, monthlyPoints, totalPoints);
+    }
+
+    // -------------------- VALIDATIONS --------------------
+    private void validateCustomer(long customerId) {
+        if (customerId <= 0) {
+            throw new InvalidRequestException("Invalid customerId");
+        }
+        if (!customerRepository.existsById(customerId)) {
+            throw new CustomerNotFoundException(
+                    "Customer not found for id: " + customerId);
+        }
+    }
+
+    private void validateDates(OffsetDateTime startDate, OffsetDateTime endDate) {
+        if (startDate == null || endDate == null) {
+            throw new InvalidRequestException("startDate and endDate are required");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidRequestException("Invalid date range");
+        }
+    }
 }
