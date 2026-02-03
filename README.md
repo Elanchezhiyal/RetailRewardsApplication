@@ -83,32 +83,52 @@ Sample API requests:
 
        sample response:
          {
-            "code": 200,
-            "message": "SUCCESS",
-            "payload": {
-                "customerId": 2,
-                "monthlyPoints": [
-                    {
-                        "year": 2025,
-                        "month": 11,
-                        "points": 202
-                    },
-                    {
-                        "year": 2025,
-                        "month": 12,
-                        "points": 51
-                    },
-                    {
-                        "year": 2026,
-                        "month": 1,
-                        "points": 0
-                    }
-                ],
-                "totalPoints": 253,
-                "customerName": null
-            }
-        }
-
+          "code": 200,
+          "message": "SUCCESS",
+          "payload": {
+              "customerId": 3,
+              "monthlyPoints": [
+                  {
+                      "yearMonth": "2025-12",
+                      "points": 30,
+                      "transactionList": [
+                          {
+                              "id": 14,
+                              "date": "2025-12",
+                              "amount": 115.00,
+                              "pointsEarned": 30
+                          }
+                      ]
+                  },
+                  {
+                      "yearMonth": "2026-01",
+                      "points": 85,
+                      "transactionList": [
+                          {
+                              "id": 11,
+                              "date": "2026-01",
+                              "amount": 90.00,
+                              "pointsEarned": 40
+                          },
+                          {
+                              "id": 13,
+                              "date": "2026-01",
+                              "amount": 95.00,
+                              "pointsEarned": 45
+                          },
+                          {
+                              "id": 12,
+                              "date": "2026-01",
+                              "amount": 43.00,
+                              "pointsEarned": 0
+                          }
+                      ]
+                  }
+              ],
+              "totalPoints": 115,
+              "customerName": "Happy"
+          }
+      }
 2. Get Rewards for All Customers (last 3 months)
       GET http://localhost:8081/api/rewards/customers/last3months
    
@@ -121,86 +141,192 @@ Sample API requests:
                   "customerId": 1,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 11,
-                          "points": 110
+                          "yearMonth": "2025-12",
+                          "points": 200,
+                          "transactionList": [
+                              {
+                                  "id": 3,
+                                  "date": "2025-12",
+                                  "amount": 200.00,
+                                  "pointsEarned": 200
+                              },
+                              {
+                                  "id": 4,
+                                  "date": "2025-12",
+                                  "amount": 45.00,
+                                  "pointsEarned": 0
+                              }
+                          ]
                       },
                       {
-                          "year": 2025,
-                          "month": 12,
-                          "points": 250
-                      },
-                      {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 115
+                          "yearMonth": "2026-01",
+                          "points": 65,
+                          "transactionList": [
+                              {
+                                  "id": 1,
+                                  "date": "2026-01",
+                                  "amount": 120.00,
+                                  "pointsEarned": 40
+                              },
+                              {
+                                  "id": 2,
+                                  "date": "2026-01",
+                                  "amount": 75.00,
+                                  "pointsEarned": 25
+                              }
+                          ]
                       }
                   ],
-                  "totalPoints": 475,
-                  "customerName": null
+                  "totalPoints": 265,
+                  "customerName": "Ram"
               },
               {
                   "customerId": 2,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 11,
-                          "points": 202
+                          "yearMonth": "2025-11",
+                          "points": 102,
+                          "transactionList": [
+                              {
+                                  "id": 9,
+                                  "date": "2025-11",
+                                  "amount": 101.00,
+                                  "pointsEarned": 2
+                              },
+                              {
+                                  "id": 10,
+                                  "date": "2025-11",
+                                  "amount": 150.00,
+                                  "pointsEarned": 100
+                              }
+                          ]
                       },
                       {
-                          "year": 2025,
-                          "month": 12,
-                          "points": 51
+                          "yearMonth": "2025-12",
+                          "points": 51,
+                          "transactionList": [
+                              {
+                                  "id": 7,
+                                  "date": "2025-12",
+                                  "amount": 51.00,
+                                  "pointsEarned": 1
+                              },
+                              {
+                                  "id": 8,
+                                  "date": "2025-12",
+                                  "amount": 100.00,
+                                  "pointsEarned": 50
+                              }
+                          ]
                       },
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 0
+                          "yearMonth": "2026-01",
+                          "points": 0,
+                          "transactionList": [
+                              {
+                                  "id": 6,
+                                  "date": "2026-01",
+                                  "amount": 50.00,
+                                  "pointsEarned": 0
+                              }
+                          ]
                       }
                   ],
-                  "totalPoints": 253,
-                  "customerName": null
+                  "totalPoints": 153,
+                  "customerName": "Rose"
               },
               {
                   "customerId": 3,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 12,
-                          "points": 80
+                          "yearMonth": "2025-12",
+                          "points": 30,
+                          "transactionList": [
+                              {
+                                  "id": 14,
+                                  "date": "2025-12",
+                                  "amount": 115.00,
+                                  "pointsEarned": 30
+                              }
+                          ]
                       },
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 85
+                          "yearMonth": "2026-01",
+                          "points": 85,
+                          "transactionList": [
+                              {
+                                  "id": 11,
+                                  "date": "2026-01",
+                                  "amount": 90.00,
+                                  "pointsEarned": 40
+                              },
+                              {
+                                  "id": 12,
+                                  "date": "2026-01",
+                                  "amount": 43.00,
+                                  "pointsEarned": 0
+                              },
+                              {
+                                  "id": 13,
+                                  "date": "2026-01",
+                                  "amount": 95.00,
+                                  "pointsEarned": 45
+                              }
+                          ]
                       }
                   ],
-                  "totalPoints": 165,
-                  "customerName": null
+                  "totalPoints": 115,
+                  "customerName": "Happy"
               },
               {
                   "customerId": 4,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 11,
-                          "points": 70
+                          "yearMonth": "2025-11",
+                          "points": 20,
+                          "transactionList": [
+                              {
+                                  "id": 17,
+                                  "date": "2025-11",
+                                  "amount": 110.00,
+                                  "pointsEarned": 20
+                              }
+                          ]
                       }
                   ],
-                  "totalPoints": 70,
-                  "customerName": null
+                  "totalPoints": 20,
+                  "customerName": "Navin"
               },
               {
                   "customerId": 5,
                   "monthlyPoints": [
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 45
+                          "yearMonth": "2026-01",
+                          "points": 45,
+                          "transactionList": [
+                              {
+                                  "id": 19,
+                                  "date": "2026-01",
+                                  "amount": 90.00,
+                                  "pointsEarned": 40
+                              },
+                              {
+                                  "id": 20,
+                                  "date": "2026-01",
+                                  "amount": 45.00,
+                                  "pointsEarned": 0
+                              },
+                              {
+                                  "id": 21,
+                                  "date": "2026-01",
+                                  "amount": 55.00,
+                                  "pointsEarned": 5
+                              }
+                          ]
                       }
                   ],
                   "totalPoints": 45,
-                  "customerName": null
+                  "customerName": "Laura"
               }
           ]
       }
@@ -212,32 +338,57 @@ Sample API requests:
 
        sample Response:
            {
-          "code": 200,
-          "message": "SUCCESS",
-          "payload": {
-              "customerId": 1,
-              "monthlyPoints": [
-                  {
-                      "year": 2025,
-                      "month": 12,
-                      "points": 250
-                  },
-                  {
-                      "year": 2026,
-                      "month": 1,
-                      "points": 115
-                  }
-              ],
-              "totalPoints": 365,
-              "customerName": null
+            "code": 200,
+            "message": "SUCCESS",
+            "payload": {
+                "customerId": 1,
+                "monthlyPoints": [
+                    {
+                        "yearMonth": "2025-12",
+                        "points": 200,
+                        "transactionList": [
+                            {
+                                "id": 3,
+                                "date": "2025-12",
+                                "amount": 200.00,
+                                "pointsEarned": 200
+                            },
+                            {
+                                "id": 4,
+                                "date": "2025-12",
+                                "amount": 45.00,
+                                "pointsEarned": 0
+                            }
+                        ]
+                    },
+                    {
+                        "yearMonth": "2026-01",
+                        "points": 65,
+                        "transactionList": [
+                            {
+                                "id": 1,
+                                "date": "2026-01",
+                                "amount": 120.00,
+                                "pointsEarned": 40
+                            },
+                            {
+                                "id": 2,
+                                "date": "2026-01",
+                                "amount": 75.00,
+                                "pointsEarned": 25
+                            }
+                        ]
+                    }
+                ],
+                "totalPoints": 265,
+                "customerName": "Ram"
             }
-          }
+        }
 4.  Get Rewards for all customers Between Custom Dates
     GET  http://localhost:8081/api/rewards/customers?startDate=<date>&endDate=<date>
     sample: GET http://localhost:8081/api/rewards/customers?startDate=2025-12-01T00:00:00Z&endDate=2026-01-31T23:59:59Z
 
         sample Response:
-
           {
           "code": 200,
           "message": "SUCCESS",
@@ -246,64 +397,155 @@ Sample API requests:
                   "customerId": 1,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 12,
-                          "points": 250
+                          "yearMonth": "2025-12",
+                          "points": 200,
+                          "transactionList": [
+                              {
+                                  "id": 3,
+                                  "date": "2025-12",
+                                  "amount": 200.00,
+                                  "pointsEarned": 200
+                              },
+                              {
+                                  "id": 4,
+                                  "date": "2025-12",
+                                  "amount": 45.00,
+                                  "pointsEarned": 0
+                              }
+                          ]
                       },
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 115
+                          "yearMonth": "2026-01",
+                          "points": 65,
+                          "transactionList": [
+                              {
+                                  "id": 1,
+                                  "date": "2026-01",
+                                  "amount": 120.00,
+                                  "pointsEarned": 40
+                              },
+                              {
+                                  "id": 2,
+                                  "date": "2026-01",
+                                  "amount": 75.00,
+                                  "pointsEarned": 25
+                              }
+                          ]
                       }
                   ],
-                  "totalPoints": 365,
-                  "customerName": null
+                  "totalPoints": 265,
+                  "customerName": "Ram"
               },
               {
                   "customerId": 2,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 12,
-                          "points": 51
+                          "yearMonth": "2025-12",
+                          "points": 51,
+                          "transactionList": [
+                              {
+                                  "id": 7,
+                                  "date": "2025-12",
+                                  "amount": 51.00,
+                                  "pointsEarned": 1
+                              },
+                              {
+                                  "id": 8,
+                                  "date": "2025-12",
+                                  "amount": 100.00,
+                                  "pointsEarned": 50
+                              }
+                          ]
                       },
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 0
+                          "yearMonth": "2026-01",
+                          "points": 0,
+                          "transactionList": [
+                              {
+                                  "id": 6,
+                                  "date": "2026-01",
+                                  "amount": 50.00,
+                                  "pointsEarned": 0
+                              }
+                          ]
                       }
                   ],
                   "totalPoints": 51,
-                  "customerName": null
+                  "customerName": "Rose"
               },
               {
                   "customerId": 3,
                   "monthlyPoints": [
                       {
-                          "year": 2025,
-                          "month": 12,
-                          "points": 80
+                          "yearMonth": "2025-12",
+                          "points": 30,
+                          "transactionList": [
+                              {
+                                  "id": 14,
+                                  "date": "2025-12",
+                                  "amount": 115.00,
+                                  "pointsEarned": 30
+                              }
+                          ]
                       },
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 85
+                          "yearMonth": "2026-01",
+                          "points": 85,
+                          "transactionList": [
+                              {
+                                  "id": 11,
+                                  "date": "2026-01",
+                                  "amount": 90.00,
+                                  "pointsEarned": 40
+                              },
+                              {
+                                  "id": 12,
+                                  "date": "2026-01",
+                                  "amount": 43.00,
+                                  "pointsEarned": 0
+                              },
+                              {
+                                  "id": 13,
+                                  "date": "2026-01",
+                                  "amount": 95.00,
+                                  "pointsEarned": 45
+                              }
+                          ]
                       }
                   ],
-                  "totalPoints": 165,
-                  "customerName": null
+                  "totalPoints": 115,
+                  "customerName": "Happy"
               },
               {
                   "customerId": 5,
                   "monthlyPoints": [
                       {
-                          "year": 2026,
-                          "month": 1,
-                          "points": 45
+                          "yearMonth": "2026-01",
+                          "points": 45,
+                          "transactionList": [
+                              {
+                                  "id": 19,
+                                  "date": "2026-01",
+                                  "amount": 90.00,
+                                  "pointsEarned": 40
+                              },
+                              {
+                                  "id": 20,
+                                  "date": "2026-01",
+                                  "amount": 45.00,
+                                  "pointsEarned": 0
+                              },
+                              {
+                                  "id": 21,
+                                  "date": "2026-01",
+                                  "amount": 55.00,
+                                  "pointsEarned": 5
+                              }
+                          ]
                       }
                   ],
                   "totalPoints": 45,
-                  "customerName": null
+                  "customerName": "Laura"
               }
           ]
       }
