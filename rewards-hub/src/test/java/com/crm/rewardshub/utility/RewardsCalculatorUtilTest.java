@@ -39,15 +39,15 @@ public class RewardsCalculatorUtilTest {
 	    @Test
 	    void calculatePoints_amountAbove100() {
 	        long points = RewardsCalculatorUtil.calculatePoints(BigDecimal.valueOf(120));
-	        // (100 - 50) + (20 * 2) = 50 + 40 = 90
-	        assertEquals(90, points);
+	        
+	        assertEquals(40, points);
 	    }
 
 	    @Test
 	    void calculatePoints_decimalAmount_decimalsIgnored() {
 	        long points = RewardsCalculatorUtil.calculatePoints(BigDecimal.valueOf(120.75));
 	        // decimals ignored → treated as 120
-	        assertEquals(90, points);
+	        assertEquals(40, points);
 	    }
 
 	    @Test

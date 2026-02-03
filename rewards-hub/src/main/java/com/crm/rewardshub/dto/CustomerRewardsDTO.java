@@ -30,7 +30,6 @@ public class CustomerRewardsDTO {
 	
 
 	public CustomerRewardsDTO(Long customerId, Long totalPoints) {
-		super();
 		this.customerId = customerId;
 		this.totalPoints = totalPoints;
 	}
@@ -59,11 +58,11 @@ public class CustomerRewardsDTO {
 		this.monthlyPoints = monthlyPoints;
 	}
 
-	public long getTotalPoints() {
+	public Long getTotalPoints() {
 		return totalPoints;
 	}
 
-	public void setTotalPoints(long totalPoints) {
+	public void setTotalPoints(Long totalPoints) {
 		this.totalPoints = totalPoints;
 	}
 	

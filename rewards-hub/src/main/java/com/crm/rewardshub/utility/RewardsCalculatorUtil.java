@@ -6,7 +6,7 @@ import com.crm.rewardshub.exception.InvalidRequestException;
 
 public class RewardsCalculatorUtil {
 
-	public static long calculatePoints(BigDecimal amount) {
+	public static Long calculatePoints(BigDecimal amount) {
 
         if (amount == null) {
             throw new InvalidRequestException("Transaction amount cannot be null");
@@ -16,15 +16,15 @@ public class RewardsCalculatorUtil {
             throw new InvalidRequestException("Transaction amount cannot be negative");
         }
 
-        long dollars = amount.longValue(); // decimals intentionally ignored
-        long points = 0;
-
-        if (dollars > 50) {
-            points += Math.min(dollars, 100) - 50;
-        }
+        Long dollars = amount.longValue(); // decimals intentionally ignored
+        Long points = 0L;
         if (dollars > 100) {
             points += (dollars - 100) * 2;
         }
+        else if (dollars > 50) {
+            points += Math.min(dollars, 100) - 50;
+        }
+        
         return points;
     }
 }

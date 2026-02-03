@@ -1,100 +1,132 @@
 package com.crm.rewardshub.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verify;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import com.crm.rewardshub.api.ResponseJson;
 import com.crm.rewardshub.dto.CustomerRewardsDTO;
 import com.crm.rewardshub.dto.MonthlyPointsDTO;
-import com.crm.rewardshub.service.RewardsService;
+import com.crm.rewardshub.service.impl.RewardsServiceImpl;
 
+@ExtendWith(MockitoExtension.class)
 class CustomerRewardsControllerTest {
 
-    private MockMvc mockMvc;
-
     @Mock
-    private RewardsService rewardsService;
+    private RewardsServiceImpl rewardsService;
 
     @InjectMocks
     private CustomerRewardsController controller;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .build();
-    }
-
-    private CustomerRewardsDTO mockDto() {
-        return new CustomerRewardsDTO(
-                1L,
-                List.of(new MonthlyPointsDTO(2024, 1, 120)),
-                120L
-        );
-    }
+    // ---------------- getCustomerRewards ----------------
 
     @Test
-    void getCustomerRewards_success() throws Exception {
+    void getCustomerRewards_success() {
 
-        when(rewardsService.getCustomerRewards(
-                eq(1L), any(OffsetDateTime.class), any(OffsetDateTime.class)))
-                .thenReturn(mockDto());
+        long customerId = 1L;
+        OffsetDateTime startDate = OffsetDateTime.parse("2024-01-01T00:00:00Z");
+        OffsetDateTime endDate = OffsetDateTime.parse("2024-03-31T23:59:59Z");
 
-        mockMvc.perform(get("/api/rewards/customers/1")
-                        .param("startDate", "2024-01-01T00:00:00Z")
-                        .param("endDate", "2024-03-31T23:59:59Z"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.payload.customerId").value(1))
-                .andExpect(jsonPath("$.payload.totalPoints").value(120));
+        CustomerRewardsDTO dto = buildCustomerRewardsDTO(customerId);
+
+        when(rewardsService.getCustomerRewards(customerId, startDate, endDate))
+                .thenReturn(dto);
+
+        ResponseEntity<ResponseJson<CustomerRewardsDTO>> response =
+                controller.getCustomerRewards(customerId, startDate, endDate);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(customerId, response.getBody().getPayload().getCustomerId());
+
+        verify(rewardsService).getCustomerRewards(customerId, startDate, endDate);
     }
 
+    // ---------------- getAllCustomerRewards ----------------
+
     @Test
-    void getAllCustomerRewards_success() throws Exception {
+    void getAllCustomerRewards_success() {
 
-        when(rewardsService.getAllCustomerRewards(any(), any()))
-                .thenReturn(List.of(mockDto()));
+        OffsetDateTime startDate = OffsetDateTime.parse("2024-01-01T00:00:00Z");
+        OffsetDateTime endDate = OffsetDateTime.parse("2024-03-31T23:59:59Z");
 
-        mockMvc.perform(get("/api/rewards/customers")
-                        .param("startDate", "2024-01-01T00:00:00Z")
-                        .param("endDate", "2024-03-31T23:59:59Z"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.payload[0].customerId").value(1));
+        when(rewardsService.getAllCustomerRewards(startDate, endDate))
+                .thenReturn(List.of(
+                        buildCustomerRewardsDTO(1L),
+                        buildCustomerRewardsDTO(2L)
+                ));
+
+        ResponseEntity<ResponseJson<List<CustomerRewardsDTO>>> response =
+                controller.getAllCustomerRewards(startDate, endDate);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        verify(rewardsService).getAllCustomerRewards(startDate, endDate);
     }
 
+    // ---------------- getCustomerRewardsLast3Months ----------------
+
     @Test
-    void getCustomerRewardsLast3Months_success() throws Exception {
+    void getCustomerRewardsLast3Months_success() {
 
         when(rewardsService.getCustomerRewardsLast3Months(1L))
-                .thenReturn(mockDto());
+                .thenReturn(buildCustomerRewardsDTO(1L));
 
-        mockMvc.perform(get("/api/rewards/customers/1/last3months"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.payload.totalPoints").value(120));
+        ResponseEntity<ResponseJson<CustomerRewardsDTO>> response =
+                controller.getCustomerRewardsLast3Months(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1L, response.getBody().getPayload().getCustomerId());
+
+        verify(rewardsService).getCustomerRewardsLast3Months(1L);
     }
 
+    // ---------------- getAllCustomerRewardsLast3Months ----------------
+
     @Test
-    void getAllCustomerRewardsLast3Months_success() throws Exception {
+    void getAllCustomerRewardsLast3Months_success() {
 
         when(rewardsService.getAllCustomerRewardsLast3Months())
-                .thenReturn(List.of(mockDto()));
+                .thenReturn(List.of(
+                        buildCustomerRewardsDTO(1L),
+                        buildCustomerRewardsDTO(2L)
+                ));
 
-        mockMvc.perform(get("/api/rewards/customers/last3months"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.payload").isArray());
+        ResponseEntity<ResponseJson<List<CustomerRewardsDTO>>> response =
+                controller.getAllCustomerRewardsLast3Months();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(2, response.getBody().getPayload().size());
+
+        verify(rewardsService).getAllCustomerRewardsLast3Months();
+    }
+
+    // ===================== TEST DATA =====================
+
+    private CustomerRewardsDTO buildCustomerRewardsDTO(Long customerId) {
+
+        MonthlyPointsDTO monthlyPoints = new MonthlyPointsDTO(
+                "2024-01",
+                100L,
+                List.of()
+        );
+
+        return new CustomerRewardsDTO(
+                customerId,
+                List.of(monthlyPoints),
+                100L
+        );
     }
 }

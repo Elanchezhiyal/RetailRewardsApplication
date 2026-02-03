@@ -34,5 +34,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ResponseJson.error(500, "Internal server error"));
     }
+    
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public ResponseEntity<ResponseJson<Void>> handleNoTransactionsFound(TransactionNotFoundException ex){
+    	 return ResponseEntity
+                 .status(HttpStatus.NOT_FOUND)
+                 .body(ResponseJson.error(404, ex.getMessage()));
+    }
 }
 

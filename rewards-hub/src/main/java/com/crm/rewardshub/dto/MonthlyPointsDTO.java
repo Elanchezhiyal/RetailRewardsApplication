@@ -1,39 +1,55 @@
 package com.crm.rewardshub.dto;
 
+import java.util.List;
+
 public class MonthlyPointsDTO {
 
-	private int year;
-	private int month;
-	private long points;
+	private String yearMonth;
+	private Long points;
+	private List<TransactionDTO> transactionList;
 	
 	
 	public MonthlyPointsDTO() {
 
 	}
-	public MonthlyPointsDTO(int year, int month, long points) {
 
-		this.year = year;
-		this.month = month;
-		this.points = points;
+
+	public String getYearMonth() {
+		return yearMonth;
 	}
-	public int getYear() {
-		return year;
+
+
+	public void setYearMonth(String yearMonth) {
+		this.yearMonth = yearMonth;
 	}
-	public void setYear(int year) {
-		this.year = year;
-	}
-	public int getMonth() {
-		return month;
-	}
-	public void setMonth(int month) {
-		this.month = month;
-	}
-	public long getPoints() {
+
+
+	public Long getPoints() {
 		return points;
 	}
-	public void setPoints(long points) {
+
+
+	public void setPoints(Long points) {
 		this.points = points;
 	}
+
+
+	public List<TransactionDTO> getTransactionList() {
+		return transactionList;
+	}
+
+
+	public void setTransactionList(List<TransactionDTO> transactionList) {
+		this.transactionList = transactionList;
+	}
+
+
+	public MonthlyPointsDTO(String yearMonth, Long points, List<TransactionDTO> transactionList) {
+		this.yearMonth = yearMonth;
+		this.points = points;
+		this.transactionList = transactionList;
+	}
+	
 	
 	
 }
